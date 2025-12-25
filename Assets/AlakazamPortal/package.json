@@ -1,0 +1,21 @@
+{
+  "name": "com.alakazam.portal",
+  "version": "0.0.1",
+  "displayName": "Alakazam Portal",
+  "description": "Transform any greybox into a stylized game render in real-time.",
+  "unity": "6000.0",
+  "documentationUrl": "https://docs.alakazam.gg",
+  "changelogUrl": "https://docs.alakazam.gg/changelog",
+  "licensesUrl": "https://alakazam.gg/license",
+  "keywords": [
+    "ai",
+    "stylization",
+    "real-time",
+    "rendering",
+    "greybox"
+  ],
+  "author": {
+    "name": "Alakazam",
+    "url": "https://alakazam.gg"
+  }
+}
