@@ -297,6 +297,18 @@ namespace AlakazamPortal.Demo
 
         private void ToggleSplitScreen()
         {
+            // Lazy setup: grab output rect if we don't have it yet
+            if (_outputRect == null && alakazamController != null)
+            {
+                var output = alakazamController.OutputDisplay;
+                if (output != null)
+                {
+                    _outputRect = output.GetComponent<RectTransform>();
+                    _outputOriginalAnchorMin = _outputRect.anchorMin;
+                    _outputOriginalAnchorMax = _outputRect.anchorMax;
+                }
+            }
+
             _splitScreenActive = !_splitScreenActive;
 
             if (_originalView != null)
