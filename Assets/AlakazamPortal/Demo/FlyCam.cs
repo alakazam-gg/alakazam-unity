@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace NeuralAkazam.Demo
+namespace AlakazamPortal.Demo
 {
     /// <summary>
     /// Simple fly camera controller for exploring scenes.

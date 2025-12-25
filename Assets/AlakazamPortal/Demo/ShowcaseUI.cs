@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-namespace NeuralAkazam.Demo
+namespace AlakazamPortal.Demo
 {
     /// <summary>
     /// Clean showcase UI for demos.
@@ -13,7 +13,7 @@ namespace NeuralAkazam.Demo
     public class ShowcaseUI : MonoBehaviour
     {
         [Header("References")]
-        [SerializeField] private MirageController mirageController;
+        [SerializeField] private AlakazamController alakazamController;
 
         [Header("Style Presets")]
         [SerializeField] private StylePreset[] presets = new[]
@@ -50,24 +50,24 @@ namespace NeuralAkazam.Demo
 
         private void Start()
         {
-            if (mirageController == null)
-                mirageController = FindObjectOfType<MirageController>();
+            if (alakazamController == null)
+                alakazamController = FindObjectOfType<AlakazamController>();
 
             CreateUI();
             SetupSplitScreen();
 
-            if (autoStart && mirageController != null)
+            if (autoStart && alakazamController != null)
             {
-                mirageController.StartMirage();
+                alakazamController.StartAlakazam();
             }
         }
 
         private void SetupSplitScreen()
         {
-            if (mirageController == null) return;
+            if (alakazamController == null) return;
 
             // Get the output display (AI-transformed view)
-            var output = mirageController.OutputDisplay;
+            var output = alakazamController.OutputDisplay;
             if (output != null)
             {
                 _outputRect = output.GetComponent<RectTransform>();
@@ -210,7 +210,7 @@ namespace NeuralAkazam.Demo
             yield return new WaitForEndOfFrame();
 
             string timestamp = System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-            string filename = $"NeuralAkazam_{timestamp}.png";
+            string filename = $"AlakazamPortal_{timestamp}.png";
             string path = System.IO.Path.Combine(Application.persistentDataPath, filename);
 
             // Capture screen to texture
@@ -265,20 +265,20 @@ namespace NeuralAkazam.Demo
 
         private void ToggleStartStop()
         {
-            if (mirageController == null) return;
+            if (alakazamController == null) return;
 
-            if (mirageController.IsStreaming || mirageController.IsConnected)
+            if (alakazamController.IsStreaming || alakazamController.IsConnected)
             {
-                mirageController.Stop();
+                alakazamController.Stop();
             }
             else
             {
                 // Apply current prompt before starting
                 if (!string.IsNullOrEmpty(_promptField.text))
                 {
-                    mirageController.SetPrompt(_promptField.text, enhancePrompt);
+                    alakazamController.SetPrompt(_promptField.text, enhancePrompt);
                 }
-                mirageController.StartMirage();
+                alakazamController.StartAlakazam();
             }
 
             UpdateStartStopButton();
@@ -288,7 +288,7 @@ namespace NeuralAkazam.Demo
         {
             if (_startStopButton == null || _startStopText == null) return;
 
-            bool isRunning = mirageController != null && (mirageController.IsStreaming || mirageController.IsConnected);
+            bool isRunning = alakazamController != null && (alakazamController.IsStreaming || alakazamController.IsConnected);
             _startStopText.text = isRunning ? "STOP" : "START";
             _startStopButton.GetComponent<Image>().color = isRunning
                 ? new Color(0.8f, 0.3f, 0.3f, 1f)  // Red for stop
@@ -349,7 +349,7 @@ namespace NeuralAkazam.Demo
             var canvasGO = new GameObject("ShowcaseUI");
             _canvas = canvasGO.AddComponent<Canvas>();
             _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            _canvas.sortingOrder = 200; // Above MirageController's output canvas (100)
+            _canvas.sortingOrder = 200; // Above AlakazamController's output canvas (100)
 
             var scaler = canvasGO.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -422,7 +422,7 @@ namespace NeuralAkazam.Demo
             branding.fontSize = 14;
             branding.alignment = TextAnchor.LowerRight;
             branding.color = new Color(1, 1, 1, 0.5f);
-            branding.text = "NeuralAkazam + Decart MirageLSD";
+            branding.text = "AlakazamPortal";
         }
 
         private void CreatePromptField(Transform parent)
@@ -479,8 +479,8 @@ namespace NeuralAkazam.Demo
             _promptField.placeholder = placeholder;
 
             // Set initial prompt from controller
-            if (mirageController != null)
-                _promptField.text = mirageController.Prompt;
+            if (alakazamController != null)
+                _promptField.text = alakazamController.Prompt;
 
             _promptField.onEndEdit.AddListener(OnPromptSubmit);
         }
@@ -638,25 +638,25 @@ namespace NeuralAkazam.Demo
 
         private void ApplyPrompt()
         {
-            if (mirageController != null && !string.IsNullOrEmpty(_promptField.text))
+            if (alakazamController != null && !string.IsNullOrEmpty(_promptField.text))
             {
-                mirageController.SetPrompt(_promptField.text, enhancePrompt);
+                alakazamController.SetPrompt(_promptField.text, enhancePrompt);
             }
         }
 
         private void UpdateStatus()
         {
-            if (mirageController == null)
+            if (alakazamController == null)
             {
                 _statusIndicator.text = "<color=#ff4444>●</color> No Controller";
                 return;
             }
 
-            if (mirageController.IsStreaming)
+            if (alakazamController.IsStreaming)
             {
                 _statusIndicator.text = "<color=#44ff44>●</color> Live";
             }
-            else if (mirageController.IsConnected)
+            else if (alakazamController.IsConnected)
             {
                 _statusIndicator.text = "<color=#ffff44>●</color> Connecting...";
             }

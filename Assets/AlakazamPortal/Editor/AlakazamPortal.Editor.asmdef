@@ -1,9 +1,9 @@
 {
-    "name": "NeuralAkazam.Editor",
-    "rootNamespace": "NeuralAkazam.Editor",
+    "name": "AlakazamPortal.Editor",
+    "rootNamespace": "AlakazamPortal.Editor",
     "references": [
-        "NeuralAkazam.Runtime",
-        "NeuralAkazam.Demo"
+        "AlakazamPortal.Runtime",
+        "AlakazamPortal.Demo"
     ],
     "includePlatforms": [
         "Editor"

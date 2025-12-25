@@ -2,14 +2,14 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 
-namespace NeuralAkazam.Editor
+namespace AlakazamPortal.Editor
 {
     /// <summary>
-    /// Editor utility to create a ready-to-go MirageLSD demo scene.
+    /// Editor utility to create ready-to-go Alakazam demo scenes.
     /// </summary>
-    public static class CreateMirageDemo
+    public static class CreateAlakazamDemo
     {
-        [MenuItem("NeuralAkazam/Create Demo Scene")]
+        [MenuItem("AlakazamPortal/Create Demo Scene")]
         public static void CreateDemoScene()
         {
             // Create new scene
@@ -51,7 +51,7 @@ namespace NeuralAkazam.Editor
             cube.GetComponent<MeshRenderer>().material = cubeMat;
 
             // Add CubeMover script
-            var cubeMover = cube.AddComponent<Demo.CubeMover>();
+            cube.AddComponent<Demo.CubeMover>();
 
             // Create some decoration cubes for visual interest
             CreateDecorCube(new Vector3(-5, 0.5f, 5), new Color(1f, 0.3f, 0.3f));
@@ -67,38 +67,37 @@ namespace NeuralAkazam.Editor
             light.color = new Color(1f, 0.95f, 0.9f);
             lightGO.transform.rotation = Quaternion.Euler(50, -30, 0);
 
-            // Create MirageController object
-            var mirageGO = new GameObject("MirageController");
-            var mirageController = mirageGO.AddComponent<MirageController>();
+            // Create AlakazamController object
+            var alakazamGO = new GameObject("AlakazamController");
+            alakazamGO.AddComponent<AlakazamController>();
 
-            // Create MirageDemo object
-            var demoGO = new GameObject("MirageDemo");
-            var mirageDemo = demoGO.AddComponent<Demo.MirageDemo>();
+            // Create ShowcaseUI
+            var uiGO = new GameObject("ShowcaseUI");
+            uiGO.AddComponent<Demo.ShowcaseUI>();
 
-            // Select the MirageController so user can set API key
-            Selection.activeGameObject = mirageGO;
+            // Select the AlakazamController so user can configure it
+            Selection.activeGameObject = alakazamGO;
 
             // Save scene
-            string scenePath = "Assets/NeuralAkazam/Demo/MirageDemo.unity";
+            string scenePath = "Assets/AlakazamPortal/Demo/AlakazamDemo.unity";
 
             // Ensure directory exists
-            if (!AssetDatabase.IsValidFolder("Assets/NeuralAkazam/Demo"))
+            if (!AssetDatabase.IsValidFolder("Assets/AlakazamPortal/Demo"))
             {
-                AssetDatabase.CreateFolder("Assets/NeuralAkazam", "Demo");
+                AssetDatabase.CreateFolder("Assets/AlakazamPortal", "Demo");
             }
 
             EditorSceneManager.SaveScene(scene, scenePath);
             AssetDatabase.Refresh();
 
-            Debug.Log($"[NeuralAkazam] Demo scene created at: {scenePath}");
-            Debug.Log("[NeuralAkazam] IMPORTANT: Select MirageController and set your API key in the Inspector!");
+            Debug.Log($"[AlakazamPortal] Demo scene created at: {scenePath}");
 
             EditorUtility.DisplayDialog(
-                "MirageLSD Demo Scene Created",
+                "Alakazam Demo Scene Created",
                 "Demo scene created successfully!\n\n" +
                 "Next steps:\n" +
-                "1. Select 'MirageController' in Hierarchy\n" +
-                "2. Enter your Decart API key in the Inspector\n" +
+                "1. Select 'AlakazamController' in Hierarchy\n" +
+                "2. Set Server URL (e.g., ws://localhost:9001)\n" +
                 "3. Press Play to test\n" +
                 "4. Press ENTER to start streaming\n" +
                 "5. Use [ ] keys to cycle style presets",
@@ -121,10 +120,46 @@ namespace NeuralAkazam.Editor
             cube.GetComponent<MeshRenderer>().material = mat;
         }
 
-        [MenuItem("NeuralAkazam/Open Documentation")]
-        public static void OpenDocs()
+        [MenuItem("AlakazamPortal/Add Alakazam to Current Scene")]
+        public static void AddAlakazamToScene()
         {
-            Application.OpenURL("https://docs.decart.ai/introduction");
+            // Check if already exists
+            if (Object.FindObjectOfType<AlakazamController>() != null)
+            {
+                EditorUtility.DisplayDialog(
+                    "Alakazam Already Exists",
+                    "AlakazamController is already in the scene.",
+                    "OK"
+                );
+                return;
+            }
+
+            // Create AlakazamController object
+            var alakazamGO = new GameObject("AlakazamController");
+            alakazamGO.AddComponent<AlakazamController>();
+
+            // Create ShowcaseUI
+            var uiGO = new GameObject("ShowcaseUI");
+            uiGO.AddComponent<Demo.ShowcaseUI>();
+
+            // Mark scene dirty so it can be saved
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+
+            // Select the AlakazamController so user can configure it
+            Selection.activeGameObject = alakazamGO;
+
+            Debug.Log("[AlakazamPortal] Alakazam added to scene!");
+
+            EditorUtility.DisplayDialog(
+                "Alakazam Added to Scene",
+                "AlakazamController added successfully!\n\n" +
+                "Next steps:\n" +
+                "1. Select 'AlakazamController' in Hierarchy\n" +
+                "2. Set Server URL (e.g., ws://localhost:9001)\n" +
+                "3. Press Play to test\n" +
+                "4. Press ENTER to start streaming",
+                "Got it!"
+            );
         }
     }
 }

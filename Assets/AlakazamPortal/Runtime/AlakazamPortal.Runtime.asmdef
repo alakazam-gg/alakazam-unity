@@ -1,6 +1,6 @@
 {
-    "name": "NeuralAkazam.Runtime",
-    "rootNamespace": "NeuralAkazam",
+    "name": "AlakazamPortal.Runtime",
+    "rootNamespace": "AlakazamPortal",
     "references": [
         "Unity.WebRTC"
     ],

@@ -8,20 +8,24 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace NeuralAkazam
+namespace AlakazamPortal
 {
     /// <summary>
-    /// Simple WebSocket client for Alakazam proxy server.
-    /// No WebRTC needed - just sends/receives JPEG frames over WebSocket.
+    /// Main controller for Alakazam proxy server connection.
+    ///
+    /// Connects to Alakazam proxy server via WebSocket.
+    /// Captures rendered frames from your camera and returns stylized output in real-time.
+    ///
+    /// Attach to a GameObject with a Camera to capture frames from.
+    /// The transformed output is displayed on the specified RawImage.
     /// </summary>
-    public class AlakazamClient : MonoBehaviour
+    public class AlakazamController : MonoBehaviour
     {
         [Header("Server Configuration")]
         [SerializeField] private string serverUrl = "ws://localhost:9001";
-        [SerializeField] private string apiKey = "";
 
         [Header("Prompt")]
-        [SerializeField] private string prompt = "minecraft village";
+        [SerializeField] private string prompt = "anime style, vibrant colors";
         [SerializeField] private bool enhancePrompt = true;
 
         [Header("Input")]
@@ -32,15 +36,17 @@ namespace NeuralAkazam
         [SerializeField] private float targetFps = 30f;
 
         [Header("Output")]
+        [Tooltip("UI RawImage to display output. If null and autoCreateDisplay is true, one will be created.")]
         [SerializeField] private RawImage outputDisplay;
+        [Tooltip("Automatically create a fullscreen canvas if no outputDisplay is assigned")]
         [SerializeField] private bool autoCreateDisplay = true;
 
         [Header("Status")]
         [SerializeField] private bool isConnected = false;
-        [SerializeField] private bool isReady = false;
+        [SerializeField] private bool isStreaming = false;
+        [SerializeField] private float currentFps = 0f;
         [SerializeField] private int framesSent = 0;
         [SerializeField] private int framesReceived = 0;
-        [SerializeField] private float currentFps = 0f;
 
         // WebSocket
         private ClientWebSocket _ws;
@@ -53,13 +59,15 @@ namespace NeuralAkazam
         private Texture2D _captureTexture;
         private Texture2D _outputTexture;
 
-        // FPS tracking
+        // State
         private float _fpsTimer = 0f;
         private int _fpsFrameCount = 0;
         private string _lastPrompt;
 
         public bool IsConnected => isConnected;
-        public bool IsReady => isReady;
+        public bool IsStreaming => isStreaming;
+        public string Prompt => prompt;
+        public RawImage OutputDisplay => outputDisplay;
 
         #region Unity Lifecycle
 
@@ -82,11 +90,12 @@ namespace NeuralAkazam
             // Process received frames on main thread
             ProcessReceivedFrames();
 
-            // Detect prompt changes
-            if (isReady && prompt != _lastPrompt)
+            // Detect prompt changes from Inspector
+            if (isStreaming && prompt != _lastPrompt)
             {
                 _lastPrompt = prompt;
                 _ = SendPromptAsync(prompt, enhancePrompt);
+                Debug.Log($"[AlakazamController] Prompt changed: {prompt}");
             }
 
             // FPS counter
@@ -101,28 +110,28 @@ namespace NeuralAkazam
 
         private void OnDestroy()
         {
-            Disconnect();
+            Stop();
         }
 
         #endregion
 
         #region Public API
 
-        public void Connect()
+        /// <summary>
+        /// Start the Alakazam session and begin streaming.
+        /// </summary>
+        public void StartAlakazam()
         {
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                Debug.LogError("[AlakazamClient] API key is required");
-                return;
-            }
-
-            StartCoroutine(ConnectCoroutine());
+            StartCoroutine(ConnectAndStream());
         }
 
-        public void Disconnect()
+        /// <summary>
+        /// Stop streaming and disconnect.
+        /// </summary>
+        public void Stop()
         {
             isConnected = false;
-            isReady = false;
+            isStreaming = false;
             StopAllCoroutines();
 
             _cts?.Cancel();
@@ -147,22 +156,54 @@ namespace NeuralAkazam
             {
                 _captureRT.Release();
                 Destroy(_captureRT);
+                _captureRT = null;
             }
             if (_captureTexture != null)
+            {
                 Destroy(_captureTexture);
+                _captureTexture = null;
+            }
             if (_outputTexture != null)
+            {
                 Destroy(_outputTexture);
+                _outputTexture = null;
+            }
 
-            Debug.Log("[AlakazamClient] Disconnected");
+            framesSent = 0;
+            framesReceived = 0;
+
+            Debug.Log("[AlakazamController] Stopped");
         }
 
-        public void SetPrompt(string newPrompt, bool enhance = true)
+        /// <summary>
+        /// Change the style prompt.
+        /// </summary>
+        public void SetPrompt(string newPrompt)
+        {
+            SetPrompt(newPrompt, enhancePrompt);
+        }
+
+        /// <summary>
+        /// Change the style prompt with explicit enhance option.
+        /// </summary>
+        public void SetPrompt(string newPrompt, bool enhance)
         {
             prompt = newPrompt;
             enhancePrompt = enhance;
-            if (isReady)
+            if (isStreaming)
             {
                 _ = SendPromptAsync(prompt, enhancePrompt);
+            }
+        }
+
+        /// <summary>
+        /// Toggle the effect (show original vs transformed).
+        /// </summary>
+        public void ToggleEffect()
+        {
+            if (outputDisplay != null)
+            {
+                outputDisplay.enabled = !outputDisplay.enabled;
             }
         }
 
@@ -170,9 +211,9 @@ namespace NeuralAkazam
 
         #region Connection
 
-        private IEnumerator ConnectCoroutine()
+        private IEnumerator ConnectAndStream()
         {
-            Debug.Log($"[AlakazamClient] Connecting to {serverUrl}...");
+            Debug.Log($"[AlakazamController] Connecting to {serverUrl}...");
 
             // Setup capture
             SetupCapture();
@@ -193,24 +234,24 @@ namespace NeuralAkazam
 
             if (connectTask.IsFaulted)
             {
-                Debug.LogError($"[AlakazamClient] Connection failed: {connectTask.Exception?.InnerException?.Message}");
+                Debug.LogError($"[AlakazamController] Connection failed: {connectTask.Exception?.InnerException?.Message}");
                 yield break;
             }
 
             if (!connectTask.IsCompleted)
             {
-                Debug.LogError("[AlakazamClient] Connection timeout");
+                Debug.LogError("[AlakazamController] Connection timeout");
                 _cts.Cancel();
                 yield break;
             }
 
             if (_ws.State != WebSocketState.Open)
             {
-                Debug.LogError($"[AlakazamClient] WebSocket not open: {_ws.State}");
+                Debug.LogError($"[AlakazamController] WebSocket not open: {_ws.State}");
                 yield break;
             }
 
-            Debug.Log("[AlakazamClient] WebSocket connected");
+            Debug.Log("[AlakazamController] WebSocket connected");
             isConnected = true;
 
             // Start receive loop
@@ -225,14 +266,14 @@ namespace NeuralAkazam
             var auth = new AuthMessage
             {
                 type = "auth",
-                api_key = apiKey,
                 prompt = prompt
             };
 
             var task = SendJsonAsync(auth);
             while (!task.IsCompleted) yield return null;
 
-            Debug.Log("[AlakazamClient] Auth sent");
+            _lastPrompt = prompt;
+            Debug.Log("[AlakazamController] Auth sent");
         }
 
         private void SetupCapture()
@@ -248,7 +289,7 @@ namespace NeuralAkazam
                 outputDisplay.texture = _outputTexture;
             }
 
-            Debug.Log($"[AlakazamClient] Capture setup: {captureWidth}x{captureHeight}");
+            Debug.Log($"[AlakazamController] Capture setup: {captureWidth}x{captureHeight}");
         }
 
         private void CreateFullscreenDisplay()
@@ -274,7 +315,7 @@ namespace NeuralAkazam
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
-            Debug.Log("[AlakazamClient] Created fullscreen display");
+            Debug.Log("[AlakazamController] Created fullscreen display");
         }
 
         #endregion
@@ -293,7 +334,7 @@ namespace NeuralAkazam
             }
             catch (Exception e)
             {
-                Debug.LogError($"[AlakazamClient] Send error: {e.Message}");
+                Debug.LogError($"[AlakazamController] Send error: {e.Message}");
             }
         }
 
@@ -307,7 +348,7 @@ namespace NeuralAkazam
             }
             catch (Exception e)
             {
-                Debug.LogError($"[AlakazamClient] Send error: {e.Message}");
+                Debug.LogError($"[AlakazamController] Send error: {e.Message}");
             }
         }
 
@@ -324,9 +365,9 @@ namespace NeuralAkazam
 
                     if (result.MessageType == WebSocketMessageType.Close)
                     {
-                        Debug.Log("[AlakazamClient] Server closed connection");
+                        Debug.Log("[AlakazamController] Server closed connection");
                         isConnected = false;
-                        isReady = false;
+                        isStreaming = false;
                         break;
                     }
 
@@ -339,7 +380,7 @@ namespace NeuralAkazam
 
                         if (result.MessageType == WebSocketMessageType.Binary)
                         {
-                            // Binary = JPEG frame
+                            // Binary = stylized frame
                             lock (_frameLock)
                             {
                                 _receivedFrames.Enqueue(messageData);
@@ -360,9 +401,9 @@ namespace NeuralAkazam
             }
             catch (Exception e)
             {
-                Debug.LogError($"[AlakazamClient] Receive error: {e.Message}");
+                Debug.LogError($"[AlakazamController] Receive error: {e.Message}");
                 isConnected = false;
-                isReady = false;
+                isStreaming = false;
             }
         }
 
@@ -375,7 +416,7 @@ namespace NeuralAkazam
                 enhance = enhance
             };
             await SendJsonAsync(msg);
-            Debug.Log($"[AlakazamClient] Prompt sent: {newPrompt}");
+            Debug.Log($"[AlakazamController] Prompt sent: {newPrompt}");
         }
 
         private void HandleMessage(string json)
@@ -387,24 +428,23 @@ namespace NeuralAkazam
                 switch (msg.type)
                 {
                     case "ready":
-                        Debug.Log($"[AlakazamClient] Ready! Session: {msg.session_id}, {msg.width}x{msg.height}");
-                        isReady = true;
-                        _lastPrompt = prompt;
+                        Debug.Log($"[AlakazamController] Ready! Session: {msg.session_id}, {msg.width}x{msg.height}");
+                        isStreaming = true;
                         StartCoroutine(CaptureLoop());
                         break;
 
                     case "error":
-                        Debug.LogError($"[AlakazamClient] Server error: {msg.message}");
+                        Debug.LogError($"[AlakazamController] Server error: {msg.message}");
                         break;
 
                     default:
-                        Debug.Log($"[AlakazamClient] Message: {json}");
+                        Debug.Log($"[AlakazamController] Message: {json}");
                         break;
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError($"[AlakazamClient] Failed to parse message: {e.Message}");
+                Debug.LogError($"[AlakazamController] Failed to parse message: {e.Message}");
             }
         }
 
@@ -415,9 +455,9 @@ namespace NeuralAkazam
         private IEnumerator CaptureLoop()
         {
             float frameInterval = 1f / targetFps;
-            Debug.Log($"[AlakazamClient] Starting capture at {targetFps} FPS");
+            Debug.Log($"[AlakazamController] Starting capture at {targetFps} FPS");
 
-            while (isReady)
+            while (isStreaming)
             {
                 CaptureAndSendFrame();
                 yield return new WaitForSeconds(frameInterval);
@@ -426,7 +466,7 @@ namespace NeuralAkazam
 
         private void CaptureAndSendFrame()
         {
-            if (sourceCamera == null || _captureRT == null || _ws == null || !isReady)
+            if (sourceCamera == null || _captureRT == null || _ws == null || !isStreaming)
                 return;
 
             // Render camera to capture texture
@@ -441,7 +481,7 @@ namespace NeuralAkazam
             _captureTexture.Apply();
             RenderTexture.active = null;
 
-            // Encode to JPEG
+            // Encode frame
             byte[] jpegData = _captureTexture.EncodeToJPG(jpegQuality);
 
             // Send over WebSocket
@@ -450,7 +490,7 @@ namespace NeuralAkazam
 
             if (framesSent <= 5 || framesSent % 100 == 0)
             {
-                Debug.Log($"[AlakazamClient] Sent frame {framesSent}: {jpegData.Length} bytes");
+                Debug.Log($"[AlakazamController] Sent frame {framesSent}: {jpegData.Length} bytes");
             }
         }
 
@@ -471,7 +511,7 @@ namespace NeuralAkazam
 
             if (frameData != null)
             {
-                // Decode JPEG
+                // Decode stylized frame
                 _outputTexture.LoadImage(frameData);
 
                 if (outputDisplay != null)
@@ -484,7 +524,7 @@ namespace NeuralAkazam
 
                 if (framesReceived <= 5 || framesReceived % 100 == 0)
                 {
-                    Debug.Log($"[AlakazamClient] Received frame {framesReceived}: {frameData.Length} bytes");
+                    Debug.Log($"[AlakazamController] Received frame {framesReceived}: {frameData.Length} bytes");
                 }
             }
         }
@@ -497,7 +537,6 @@ namespace NeuralAkazam
         private class AuthMessage
         {
             public string type;
-            public string api_key;
             public string prompt;
         }
 

@@ -1,15 +1,15 @@
 using UnityEngine;
 
-namespace NeuralAkazam.Demo
+namespace AlakazamPortal.Demo
 {
     /// <summary>
-    /// Drop this on any GameObject in an empty scene and it creates the entire demo.
-    /// Just set your API key and hit Play.
+    /// Drop this on any GameObject in an empty scene and it creates the entire Alakazam demo.
+    /// Just set your server URL, then hit Play.
     /// </summary>
-    public class MirageBootstrap : MonoBehaviour
+    public class AlakazamBootstrap : MonoBehaviour
     {
-        [Header("API Configuration")]
-        [SerializeField] private string apiKey = "";
+        [Header("Server Configuration")]
+        [SerializeField] private string serverUrl = "ws://localhost:9001";
 
         [Header("Options")]
         [SerializeField] private string initialPrompt = "anime style, vibrant colors, cel shading";
@@ -62,32 +62,28 @@ namespace NeuralAkazam.Demo
             light.color = new Color(1f, 0.95f, 0.9f);
             lightGO.transform.rotation = Quaternion.Euler(50, -30, 0);
 
-            // MirageController
-            var mirageGO = new GameObject("MirageController");
-            var mirage = mirageGO.AddComponent<MirageController>();
+            // AlakazamController
+            var alakazamGO = new GameObject("AlakazamController");
+            var alakazam = alakazamGO.AddComponent<AlakazamController>();
 
-            // Set API key and prompt via reflection (fields are serialized private)
-            var apiKeyField = typeof(MirageController).GetField("apiKey",
+            // Set fields via reflection (fields are serialized private)
+            var serverUrlField = typeof(AlakazamController).GetField("serverUrl",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var promptField = typeof(MirageController).GetField("prompt",
+            var promptField = typeof(AlakazamController).GetField("prompt",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
-            if (apiKeyField != null) apiKeyField.SetValue(mirage, apiKey);
-            if (promptField != null) promptField.SetValue(mirage, initialPrompt);
+            if (serverUrlField != null) serverUrlField.SetValue(alakazam, serverUrl);
+            if (promptField != null) promptField.SetValue(alakazam, initialPrompt);
 
-            // MirageDemo UI
-            var demoGO = new GameObject("MirageDemo");
-            demoGO.AddComponent<MirageDemo>();
+            // ShowcaseUI
+            var uiGO = new GameObject("ShowcaseUI");
+            uiGO.AddComponent<ShowcaseUI>();
 
-            Debug.Log("[MirageBootstrap] Demo scene created!");
+            Debug.Log("[AlakazamBootstrap] Demo scene created!");
 
-            if (string.IsNullOrEmpty(apiKey))
+            if (autoStart)
             {
-                Debug.LogWarning("[MirageBootstrap] API key not set! Enter it in the MirageBootstrap Inspector.");
-            }
-            else if (autoStart)
-            {
-                mirage.StartMirage();
+                alakazam.StartAlakazam();
             }
 
             // Self-destruct bootstrap object

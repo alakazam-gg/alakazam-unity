@@ -1,8 +1,8 @@
 {
-    "name": "NeuralAkazam.Demo",
-    "rootNamespace": "NeuralAkazam.Demo",
+    "name": "AlakazamPortal.Demo",
+    "rootNamespace": "AlakazamPortal.Demo",
     "references": [
-        "NeuralAkazam.Runtime"
+        "AlakazamPortal.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

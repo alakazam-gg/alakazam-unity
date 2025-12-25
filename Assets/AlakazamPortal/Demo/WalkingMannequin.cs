@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace NeuralAkazam.Demo
+namespace AlakazamPortal.Demo
 {
     /// <summary>
     /// Procedurally creates and animates a simple humanoid mannequin.

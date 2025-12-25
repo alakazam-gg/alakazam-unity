@@ -1,9 +1,9 @@
 using UnityEngine;
 
-namespace NeuralAkazam.Demo
+namespace AlakazamPortal.Demo
 {
     /// <summary>
-    /// Simple script to move a cube around for testing MirageLSD.
+    /// Simple script to move a cube around for testing Alakazam.
     /// WASD to move, QE to rotate, Space to jump.
     /// </summary>
     public class CubeMover : MonoBehaviour

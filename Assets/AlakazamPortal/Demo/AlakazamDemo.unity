@@ -477,7 +477,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cf965c68ab99b46699be0ccfc4ac577e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: NeuralAkazam.Demo::NeuralAkazam.Demo.WalkingMannequin
+  m_EditorClassIdentifier: AlakazamPortal.Demo::AlakazamPortal.Demo.WalkingMannequin
   walkSpeed: 0.5
   walkDistance: 5
   turnSpeed: 5
@@ -529,7 +529,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: NeuralAkazam::NeuralAkazam.MirageController
+  m_EditorClassIdentifier: AlakazamPortal::AlakazamPortal.MirageController
   apiKey: alakazam_hDVhOWvGjMNXKmCkGVzTwlgPtWibfqJOkcIOfzAeilWspIOPaOrjwqafhBCQzabZ
   prompt: anime style, grass ground
   enhancePrompt: 1
@@ -584,7 +584,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: NeuralAkazam.Demo::NeuralAkazam.Demo.MirageDemo
+  m_EditorClassIdentifier: AlakazamPortal.Demo::AlakazamPortal.Demo.MirageDemo
   mirageController: {fileID: 500002}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
