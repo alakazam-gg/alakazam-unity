@@ -1,0 +1,16 @@
+{
+    "name": "NeuralAkazam.Demo",
+    "rootNamespace": "NeuralAkazam.Demo",
+    "references": [
+        "NeuralAkazam.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

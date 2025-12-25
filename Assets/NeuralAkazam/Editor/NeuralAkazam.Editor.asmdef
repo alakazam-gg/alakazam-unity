@@ -1,0 +1,19 @@
+{
+    "name": "NeuralAkazam.Editor",
+    "rootNamespace": "NeuralAkazam.Editor",
+    "references": [
+        "NeuralAkazam.Runtime",
+        "NeuralAkazam.Demo"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
