@@ -1,77 +1,48 @@
-# Alakazam Unity
+# Alakazam Portal - Unity SDK
 
-Unity SDK for real-time AI video stylization via Alakazam Server.
+Development repository for the Alakazam Portal Unity package.
 
-## Components
+## Repository Structure
 
-### AlakazamController
-Simple WebSocket client that connects to Alakazam Server:
-- No WebRTC required (server handles AI connection)
-- Captures rendered frames from your camera
-- Returns stylized frames in real-time
-- Simple API: `StartAlakazam()`, `Stop()`, `SetPrompt()`
+```
+alakazam-unity/
+├── Assets/
+│   ├── AlakazamPortal/          ← The distributed package
+│   │   ├── Runtime/             ← Core SDK
+│   │   ├── Demo/                ← UI & helpers
+│   │   └── Editor/              ← Editor tools
+│   └── ...                      ← Dev assets (not distributed)
+└── ProjectSettings/
+```
 
-**Location:** `Assets/AlakazamPortal/Runtime/AlakazamController.cs`
+## Package Installation
 
-### AlakazamBootstrap (Demo Setup)
-Drop this on any GameObject to create a complete demo scene:
-- Creates camera, lights, mannequin, decorative objects
-- Sets up AlakazamController with your config
-- Creates ShowcaseUI
+Clients install via Unity Package Manager:
 
-**Location:** `Assets/AlakazamPortal/Demo/AlakazamBootstrap.cs`
+```
+https://github.com/alakazam/portal-unity.git?path=Assets/AlakazamPortal
+```
 
-### ShowcaseUI
-Demo UI with:
-- Style preset buttons (numbered 1-8)
-- Editable prompt field
-- Start/Stop button
-- Split-screen comparison (B key)
-- Screenshot capture (R key)
+See [Package README](Assets/AlakazamPortal/README.md) for usage instructions.
 
-**Location:** `Assets/AlakazamPortal/Demo/ShowcaseUI.cs`
+## Development
 
-## Quick Start
-
-### Option 1: Use AlakazamBootstrap (Recommended)
-1. Create an empty scene
-2. Create empty GameObject, add `AlakazamBootstrap` component
-3. Set your **Server URL** in Inspector
-4. Hit Play
-5. Press ENTER to start streaming
-
-### Option 2: Manual Setup
-1. Add `AlakazamController` to any GameObject
-2. Configure in Inspector:
-   - **Server URL:** `ws://localhost:9001` (or your server)
-   - **Source Camera:** Camera to capture
-   - **Prompt:** Style description
-3. Add `ShowcaseUI` for UI (optional)
-4. Call `StartAlakazam()` to begin
-
-## Testing with Alakazam Server
-
-1. Start the server:
-   ```bash
-   cd alakazam-server
-   PYTHONPATH=python ./venv/bin/python python/server.py
-   ```
-
-2. In Unity, hit Play and press ENTER (or call `StartAlakazam()`)
-
-3. Stylized output will appear on the fullscreen display
-
-## Keyboard Shortcuts
-
-| Key | Action |
-|-----|--------|
-| Space | Start/Stop streaming |
-| 1-8 | Select style preset |
-| Tab | Toggle UI visibility |
-| B | Split-screen comparison |
-| R | Capture screenshot |
-
-## Requirements
-
+### Requirements
 - Unity 6000.0+
-- Alakazam Server running locally or remotely
+- Alakazam server running locally for testing
+
+### Testing Locally
+1. Open the project in Unity
+2. Open any scene with low-poly assets
+3. **AlakazamPortal → Add to Current Scene**
+4. Configure server URL in AlakazamController
+5. Play and press Space to start
+
+### Recommended Test Assets
+- SimplePoly City - Low Poly Assets
+- LowPoly Environment Pack
+- Elementary Dungeon Pack Lite
+
+## Publishing
+
+Package is distributed via GitHub Packages. See internal docs for release process.
