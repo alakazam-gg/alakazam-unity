@@ -263,13 +263,23 @@ namespace AlakazamPortal
 
         private IEnumerator SendAuthCoroutine()
         {
-            var auth = new AuthMessage
+            // Check for API key
+            string apiKey = AlakazamAuth.GetApiKey();
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                Debug.LogWarning("[AlakazamController] No API key configured. Open Alakazam > Setup Wizard to configure.");
+                AlakazamAuth.HandleAuthFailed("No API key configured");
+                yield break;
+            }
+
+            var authMsg = new AuthMessage
             {
                 type = "auth",
-                prompt = prompt
+                prompt = prompt,
+                api_key = apiKey
             };
 
-            var task = SendJsonAsync(auth);
+            var task = SendJsonAsync(authMsg);
             while (!task.IsCompleted) yield return null;
 
             _lastPrompt = prompt;
@@ -429,12 +439,30 @@ namespace AlakazamPortal
                 {
                     case "ready":
                         Debug.Log($"[AlakazamController] Ready! Session: {msg.session_id}, {msg.width}x{msg.height}");
+
+                        // Update usage info
+                        if (msg.usage != null)
+                        {
+                            AlakazamAuth.UpdateUsage(
+                                msg.usage.seconds_used,
+                                msg.usage.seconds_limit,
+                                msg.usage.seconds_remaining
+                            );
+                        }
+
+                        // Handle server warning (80%+ usage)
+                        if (!string.IsNullOrEmpty(msg.warning))
+                        {
+                            AlakazamAuth.HandleWarning(msg.warning);
+                        }
+
                         isStreaming = true;
                         StartCoroutine(CaptureLoop());
                         break;
 
                     case "error":
                         Debug.LogError($"[AlakazamController] Server error: {msg.message}");
+                        AlakazamAuth.HandleAuthFailed(msg.message);
                         break;
 
                     default:
@@ -538,6 +566,7 @@ namespace AlakazamPortal
         {
             public string type;
             public string prompt;
+            public string api_key;
         }
 
         [Serializable]
@@ -556,6 +585,16 @@ namespace AlakazamPortal
             public int width;
             public int height;
             public string message;
+            public string warning;
+            public UsageData usage;
+        }
+
+        [Serializable]
+        private class UsageData
+        {
+            public int seconds_used;
+            public int seconds_limit;
+            public int seconds_remaining;
         }
 
         #endregion
