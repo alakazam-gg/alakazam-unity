@@ -152,6 +152,7 @@ namespace AlakazamPortal.Demo
         private void Update()
         {
             UpdateStatus();
+            UpdatePromptFieldForImageStyle();
 
             // Keyboard shortcuts
             if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
@@ -267,7 +268,8 @@ namespace AlakazamPortal.Demo
         {
             if (alakazamController == null) return;
 
-            if (alakazamController.IsStreaming || alakazamController.IsConnected)
+            // Only check IsStreaming - being connected for extraction shouldn't count as "running"
+            if (alakazamController.IsStreaming)
             {
                 alakazamController.Stop();
             }
@@ -288,7 +290,8 @@ namespace AlakazamPortal.Demo
         {
             if (_startStopButton == null || _startStopText == null) return;
 
-            bool isRunning = alakazamController != null && (alakazamController.IsStreaming || alakazamController.IsConnected);
+            // Only check IsStreaming - being connected for extraction shouldn't show as "running"
+            bool isRunning = alakazamController != null && alakazamController.IsStreaming;
             _startStopText.text = isRunning ? "STOP" : "START";
             _startStopButton.GetComponent<Image>().color = isRunning
                 ? new Color(0.8f, 0.3f, 0.3f, 1f)  // Red for stop
@@ -656,6 +659,40 @@ namespace AlakazamPortal.Demo
             }
         }
 
+        private void UpdatePromptFieldForImageStyle()
+        {
+            if (alakazamController == null || _promptField == null) return;
+
+            // Check if we're in image style mode
+            if (alakazamController.IsExtractingStyle)
+            {
+                // Show extracting indicator
+                if (!_promptField.text.StartsWith("["))
+                {
+                    _promptField.text = "[Extracting style from image...]";
+                    _promptField.interactable = false;
+                }
+            }
+            else if (alakazamController.IsUsingImageStyle)
+            {
+                // Show extracted style or indicator
+                string currentPrompt = alakazamController.Prompt;
+                if (_promptField.text != currentPrompt)
+                {
+                    _promptField.text = currentPrompt;
+                }
+                _promptField.interactable = false;
+            }
+            else
+            {
+                // Normal text mode - make sure field is interactable
+                if (!_promptField.interactable)
+                {
+                    _promptField.interactable = true;
+                }
+            }
+        }
+
         private void UpdateStatus()
         {
             if (alakazamController == null)
@@ -668,9 +705,13 @@ namespace AlakazamPortal.Demo
             {
                 _statusIndicator.text = "<color=#44ff44>●</color> Live";
             }
-            else if (alakazamController.IsConnected)
+            else if (alakazamController.IsExtractingStyle)
             {
-                _statusIndicator.text = "<color=#ffff44>●</color> Connecting...";
+                _statusIndicator.text = "<color=#ffff44>●</color> Extracting style...";
+            }
+            else if (alakazamController.IsUsingImageStyle)
+            {
+                _statusIndicator.text = "<color=#44aaff>●</color> Style ready (Space to start)";
             }
             else
             {
