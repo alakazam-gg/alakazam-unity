@@ -22,7 +22,7 @@ namespace AlakazamPortal
     public class AlakazamController : MonoBehaviour
     {
         [Header("Server Configuration")]
-        [SerializeField] private string serverUrl = "ws://localhost:9001";
+        [SerializeField] private string serverUrl = "ws://35.224.217.144:9001";
 
         [Header("Prompt")]
         [SerializeField] private string prompt = "anime style, vibrant colors";

@@ -9,7 +9,7 @@ namespace AlakazamPortal.Demo
     public class AlakazamBootstrap : MonoBehaviour
     {
         [Header("Server Configuration")]
-        [SerializeField] private string serverUrl = "ws://localhost:9001";
+        [SerializeField] private string serverUrl = "ws://35.224.217.144:9001";
 
         [Header("Style")]
         [SerializeField] private string initialPrompt = "anime style, vibrant colors, cel shading";

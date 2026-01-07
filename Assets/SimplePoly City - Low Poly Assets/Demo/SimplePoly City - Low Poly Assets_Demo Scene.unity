@@ -29236,6 +29236,70 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 81c050d9e127fdd45af1f6b8da476b2b, type: 3}
+--- !u!1 &1413507618
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1413507620}
+  - component: {fileID: 1413507619}
+  m_Layer: 0
+  m_Name: AlakazamUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1413507619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1413507618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AlakazamPortal.Demo::AlakazamPortal.Demo.ShowcaseUI
+  alakazamController: {fileID: 0}
+  presets:
+  - name: Cyberpunk
+    prompt: cyberpunk neon city, rain, night, blade runner aesthetic
+  - name: Anime
+    prompt: anime style, studio ghibli, vibrant colors, cel shading
+  - name: Watercolor
+    prompt: watercolor painting, soft edges, pastel colors, artistic
+  - name: Pixel Art
+    prompt: pixel art, 16-bit retro game, nostalgic
+  - name: Gothic
+    prompt: dark fantasy, gothic architecture, dramatic lighting, moody
+  - name: Van Gogh
+    prompt: van gogh starry night style, swirling brushstrokes, impressionist
+  - name: Minecraft
+    prompt: minecraft voxel style, blocky, low poly
+  - name: Noir
+    prompt: film noir, black and white, high contrast, 1940s detective
+  autoStart: 0
+  enhancePrompt: 1
+--- !u!4 &1413507620
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1413507618}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1415932981
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -31379,6 +31443,65 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b8ee657c6800ab849bb30b4375d02323, type: 3}
+--- !u!1 &1508337220
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1508337222}
+  - component: {fileID: 1508337221}
+  m_Layer: 0
+  m_Name: AlakazamController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1508337221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1508337220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2c3d4e5f6789012345678abcdef0123, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AlakazamPortal.Runtime::AlakazamPortal.AlakazamController
+  serverUrl: ' ws://35.224.217.144:9001'
+  prompt: anime style, vibrant colors
+  enhancePrompt: 1
+  sourceCamera: {fileID: 0}
+  captureWidth: 1280
+  captureHeight: 720
+  jpegQuality: 85
+  targetFps: 30
+  outputDisplay: {fileID: 0}
+  autoCreateDisplay: 1
+  isConnected: 0
+  isStreaming: 0
+  currentFps: 0
+  framesSent: 0
+  framesReceived: 0
+--- !u!4 &1508337222
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1508337220}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1527498726
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -45515,3 +45638,5 @@ SceneRoots:
   - {fileID: 1657413772}
   - {fileID: 1704015174}
   - {fileID: 1416758924}
+  - {fileID: 1508337222}
+  - {fileID: 1413507620}
